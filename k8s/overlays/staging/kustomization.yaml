@@ -1,0 +1,44 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: lojaveloz
+
+resources:
+  - ../../base/namespace.yaml
+  - ../../base/api-gateway
+  - ../../base/order-service
+  - ../../base/payment-service
+  - ../../base/stock-service
+
+patches:
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: order-service
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: payment-service
+  - patch: |-
+      - op: replace
+        path: /spec/replicas
+        value: 1
+    target:
+      kind: Deployment
+      name: stock-service
+
+images:
+  - name: lojaveloz/api-gateway
+    newTag: latest
+  - name: lojaveloz/order-service
+    newTag: latest
+  - name: lojaveloz/payment-service
+    newTag: latest
+  - name: lojaveloz/stock-service
+    newTag: latest

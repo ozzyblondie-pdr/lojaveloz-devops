@@ -1,0 +1,54 @@
+groups:
+  - name: order-service.slos
+    rules:
+      - alert: OrderServiceHighLatency
+        expr: |
+          histogram_quantile(0.99,
+            rate(http_server_requests_seconds_bucket{
+              service="order-service", status!~"5.."
+            }[5m])
+          ) > 0.5
+        for: 2m
+        labels:
+          severity: warning
+          team: backend
+        annotations:
+          summary: "p99 latência acima de 500ms no order-service"
+          description: "p99={{ $value }}s"
+
+      - alert: OrderServiceHighErrorRate
+        expr: |
+          rate(http_server_requests_seconds_count{
+            service="order-service", status=~"5.."
+          }[5m])
+          /
+          rate(http_server_requests_seconds_count{
+            service="order-service"
+          }[5m]) > 0.01
+        for: 1m
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "Taxa de erro > 1% no order-service"
+          description: "Taxa atual={{ $value | humanizePercentage }}"
+
+      - alert: OrderServiceDown
+        expr: up{service="order-service"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          team: backend
+        annotations:
+          summary: "order-service está DOWN"
+
+  - name: rabbitmq.queues
+    rules:
+      - alert: RabbitMQQueueGrowing
+        expr: rabbitmq_queue_messages{queue="order.created"} > 500
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Fila order.created acima de 500 mensagens"
+          description: "Mensagens={{ $value }}"

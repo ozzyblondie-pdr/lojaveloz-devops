@@ -1,0 +1,16 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: stock-service-scaledobject
+  namespace: lojaveloz
+spec:
+  scaleTargetRef:
+    name: stock-service
+  minReplicaCount: 1
+  maxReplicaCount: 15
+  triggers:
+    - type: rabbitmq
+      metadata:
+        host: amqp://rabbitmq-svc:5672
+        queueName: order.created
+        queueLength: "30"

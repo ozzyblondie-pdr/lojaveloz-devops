@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-gateway-config
+  namespace: lojaveloz
+data:
+  PORT: "8080"
+  ORDER_SERVICE_URL: http://order-service-svc:8081
+  PAYMENT_SERVICE_URL: http://payment-service-svc:8082
+  STOCK_SERVICE_URL: http://stock-service-svc:8083
+  OTEL_SERVICE_NAME: api-gateway
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector-svc:4318
+  LOG_LEVEL: info
+  NODE_ENV: production
